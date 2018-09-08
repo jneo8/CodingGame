@@ -12,6 +12,19 @@ type Hurnter struct {
 	y float64
 }
 
+func (h Hurnter) move(x float64, y float64) string {
+	needX := x - h.x
+	needY := y - h.y
+
+	moveX := 1000.0 * (needX / (needX + needY))
+	moveY := 1000.0 * (needY / (needX + needY))
+
+	finalX := int(h.x + moveX)
+	finalY := int(h.y + moveY)
+	result := fmt.Sprintf("%v %v", finalX, finalY)
+	return result
+}
+
 type Human struct {
 	id float64
 	x  float64
@@ -88,12 +101,15 @@ func main() {
 		for _, zombie := range zombies {
 			fmt.Fprintf(
 				os.Stderr,
-				"zombie: %#v",
+				"zombie: %#v\n",
 				zombie,
 			)
 		}
 
+		move := hurnter.move(centerX, centerY)
+		fmt.Fprintf(os.Stderr, "move: %v\n", move)
+
 		// fmt.Fprintln(os.Stderr, "Debug messages...")
-		fmt.Println("0 0") // Your destination coordinates
+		fmt.Println(move) // Your destination coordinates
 	}
 }
