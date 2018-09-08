@@ -34,13 +34,13 @@ func (h Hurnter) move(x float64, y float64) string {
 }
 
 type Human struct {
-	id float64
+	id int
 	x  float64
 	y  float64
 }
 
 type Zombie struct {
-	id    float64
+	id    int
 	xNext float64
 	yNext float64
 	x     float64
@@ -77,19 +77,31 @@ func (zombies Zombies) centerPoint() (float64, float64) {
 	return x, y
 }
 
+func stringInSlice(a int, list []int) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
+}
+
 func distance(p1X float64, p1Y float64, p2X float64, p2Y float64) float64 {
 	return math.Pow(math.Pow(p1X-p2X, 2)+math.Pow(p1Y-p2Y, 2), 0.5)
 }
 
-func findTargetZombie(h Hurnter, humans Humans, zombies Zombies) Zombie {
-	targetZombie := zombies[0]
+func findTargetZombie(ht Hurnter, humans Humans, zombies Zombies) Zombie {
 
+	targetZombie := zombies[0]
 	min := 25000.0
+	// Find target Zombie
 	for _, z := range zombies {
 		for _, h := range humans {
-			d := distance(z.x, z.y, h.x, h.y)
-			if d < min {
-				min = d
+			d1 := distance(z.x, z.y, h.x, h.y)
+			d2 := distance(z.xNext, z.yNext, ht.x, ht.y)
+			d3 := distance(z.xNext, z.yNext, h.x, h.y)
+			if d1+d2 < min && d3 > 400 {
+				min = d1 + d2
 				targetZombie = z
 			}
 		}
@@ -113,7 +125,7 @@ func main() {
 			var humanId, humanX, humanY int
 			fmt.Scan(&humanId, &humanX, &humanY)
 			human := Human{
-				id: float64(humanId),
+				id: humanId,
 				x:  float64(humanX),
 				y:  float64(humanY),
 			}
@@ -129,20 +141,13 @@ func main() {
 			var zombieId, zombieX, zombieY, zombieXNext, zombieYNext int
 			fmt.Scan(&zombieId, &zombieX, &zombieY, &zombieXNext, &zombieYNext)
 			zombie := Zombie{
-				id:    float64(zombieId),
+				id:    zombieId,
 				xNext: float64(zombieXNext),
 				yNext: float64(zombieYNext),
 				x:     float64(zombieX),
 				y:     float64(zombieY),
 			}
 			zombies = append(zombies, zombie)
-		}
-		for _, zombie := range zombies {
-			fmt.Fprintf(
-				os.Stderr,
-				"zombie: %#v\n",
-				zombie,
-			)
 		}
 
 		targetZombie := findTargetZombie(hurnter, humans, zombies)
