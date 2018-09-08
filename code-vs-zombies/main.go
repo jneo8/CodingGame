@@ -7,26 +7,23 @@ import "os"
  * Save humans, destroy zombies!
  **/
 
-type Coordinate struct {
+type Hurnter struct {
 	x int
 	y int
 }
 
-type Hurnter struct {
-	id         int
-	coordinate Coordinate
-}
-
 type Human struct {
-	id         int
-	coordinate Coordinate
+	id int
+	x  int
+	y  int
 }
 
 type Zombie struct {
-	id          int
-	zombieXNext int
-	zombieYNext int
-	coordinate  Coordinate
+	id    int
+	xNext int
+	yNext int
+	x     int
+	y     int
 }
 
 func main() {
@@ -34,7 +31,7 @@ func main() {
 		var x, y int
 		fmt.Scan(&x, &y)
 
-		hurnter := &Hurnter{id: -1, coordinate: Coordinate{x: x, y: y}}
+		hurnter := &Hurnter{x: x, y: y}
 		fmt.Fprintf(os.Stderr, "Hurnter: %#v\n", hurnter)
 
 		var humanCount int
@@ -45,11 +42,13 @@ func main() {
 			var humanId, humanX, humanY int
 			fmt.Scan(&humanId, &humanX, &humanY)
 			human := Human{
-				id:         humanId,
-				coordinate: Coordinate{x: humanX, y: humanY},
+				id: humanId,
+				x:  humanX,
+				y:  humanY,
 			}
 			humans = append(humans, human)
 		}
+
 		fmt.Fprintf(os.Stderr, "humans: %#v\n", humans)
 
 		var zombieCount int
@@ -61,21 +60,19 @@ func main() {
 			var zombieId, zombieX, zombieY, zombieXNext, zombieYNext int
 			fmt.Scan(&zombieId, &zombieX, &zombieY, &zombieXNext, &zombieYNext)
 			zombie := Zombie{
-				id:          zombieId,
-				zombieXNext: zombieXNext,
-				zombieYNext: zombieYNext,
-				coordinate:  Coordinate{x: zombieX, y: zombieY},
+				id:    zombieId,
+				xNext: zombieXNext,
+				yNext: zombieYNext,
+				x:     zombieX,
+				y:     zombieY,
 			}
 			zombies = append(zombies, zombie)
 		}
 		for _, zombie := range zombies {
 			fmt.Fprintf(
 				os.Stderr,
-				"zombie: %v\ncoordinate: %v\nnext: %v %v",
-				zombie.id,
-				zombie.coordinate,
-				zombie.zombieXNext,
-				zombie.zombieYNext,
+				"zombie: %#v",
+				zombie,
 			)
 		}
 
