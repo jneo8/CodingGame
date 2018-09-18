@@ -37,23 +37,42 @@ func distance(p1X float64, p1Y float64, p2X float64, p2Y float64) float64 {
 	return math.Pow(math.Pow(p1X-p2X, 2)+math.Pow(p1Y-p2Y, 2), 0.5)
 }
 
-func findTargetZombie(ht Hurnter, humans Humans, zombies Zombies) Zombie {
+func findTargetZombie(ht Hurnter, humans Humans, zombies Zombies, humanCount float64, zombieCount float64) (int, int) {
 
 	targetZombie := zombies[0]
+	targetHuman := humans[0]
 	min := 25000.0
 	// Find target Zombie
+	moveX := 0.0
+	moveY := 0.0
 	for _, z := range zombies {
 		for _, h := range humans {
 			d1 := distance(z.x, z.y, h.x, h.y)
 			d2 := distance(z.xNext, z.yNext, ht.x, ht.y)
 			d3 := distance(z.xNext, z.yNext, h.x, h.y)
-			if d1+d2 < min && d3 > 400 {
+			d4 := distance(h.x, h.y, ht.x, ht.y)
+
+			giveup := false
+			if d3 < 400 && d2 > 3000 {
+				giveup = true
+			}
+
+			if d1+d2 < min && giveup == false {
 				min = d1 + d2
 				targetZombie = z
+				targetHuman = h
+
+				if d1 < d4 {
+					moveX = (targetZombie.xNext + targetHuman.x) / 2
+					moveY = (targetZombie.yNext + targetHuman.y) / 2
+				} else {
+					moveX = targetZombie.xNext
+					moveY = targetZombie.yNext
+				}
 			}
 		}
 	}
-	return targetZombie
+	return int(moveX), int(moveY)
 }
 
 func main() {
@@ -97,10 +116,16 @@ func main() {
 			zombies = append(zombies, zombie)
 		}
 
-		targetZombie := findTargetZombie(hurnter, humans, zombies)
-		fmt.Fprintf(os.Stderr, "targetZombie: %#v\n", targetZombie)
+		moveX, moveY := findTargetZombie(
+			hurnter,
+			humans,
+			zombies,
+			float64(humanCount),
+			float64(zombieCount),
+		)
 
-		move := fmt.Sprintf("%v %v", int(targetZombie.xNext), int(targetZombie.yNext))
+		move := fmt.Sprintf("%v %v", moveX, moveY)
+
 		fmt.Fprintf(os.Stderr, "move: %v\n", move)
 
 		// fmt.Fprintln(os.Stderr, "Debug messages...")
